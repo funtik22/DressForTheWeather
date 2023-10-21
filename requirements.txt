@@ -1,0 +1,8 @@
+attrs
+dialogic
+dnspython
+pymongo
+mongomock
+requests
+bs4
+
