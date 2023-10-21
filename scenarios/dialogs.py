@@ -34,8 +34,9 @@ def hello(turn: DialogTurn):
 
 @csc.add_handler(priority=1000, intents=['ability'])
 def show_rules(turn: DialogTurn):
-    turn.response_text = info['ability']
-    turn.user_object['last_phrase'] = info['ability']
+    text = random.choice(info['ability'])
+    turn.response_text = text
+    turn.user_object['last_phrase'] = text
 
 
 @csc.add_handler(priority=1000, intents=['repeat_phrase'])
@@ -68,3 +69,8 @@ def total_exit(turn: DialogTurn):
 @csc.add_handler(priority=10000000, intents=['ping'])
 def ping_pong(turn: DialogTurn):
     turn.response_text = 'pong'
+
+@csc.add_handler(priority=1000, intents=['help'])
+def alice_help(turn: DialogTurn):
+    turn.response_text = 'Чтобы получить мой совет о том, как одеться по погоде, назови свой город, в котором находишься или ближайший крупный населённый пункт!'
+
