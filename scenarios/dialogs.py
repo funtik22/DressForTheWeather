@@ -3,6 +3,7 @@ from dialogic.cascade import DialogTurn
 
 from dm import csc
 
+from get_temperature import *
 import json
 import random
 
@@ -26,10 +27,10 @@ def is_new_session(turn: DialogTurn):
 @csc.add_handler(priority=10, regexp='(hello|hi|привет|здравствуй)')
 @csc.add_handler(priority=3, checker=is_new_session)
 def hello(turn: DialogTurn):
-    text = random.choice(info['hello'])
-    text = f'<speaker audio="alice-sounds-game-powerup-1.opus"> <text>{text}</text><voice>{text}</voice>'
-    turn.response_text = text
-    turn.user_object['last_phrase'] = text
+    
+    #turn.response_text = str(get_temperature('Краснодар'))
+    turn.response_text = str(get_condition('Краснодар'))
+   # turn.user_object['last_phrase'] = get_temperature('Ижевск')
 
 
 @csc.add_handler(priority=1000, intents=['ability'])
