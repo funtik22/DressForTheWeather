@@ -15,6 +15,7 @@ from dialogic.cascade import DialogTurn
 
 from dm import csc
 
+from get_temperature import *
 import json
 import random
 
