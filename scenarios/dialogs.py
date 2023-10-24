@@ -68,3 +68,11 @@ def total_exit(turn: DialogTurn):
 @csc.add_handler(priority=10000000, intents=['ping'])
 def ping_pong(turn: DialogTurn):
     turn.response_text = 'pong'
+@csc.add_handler(priority=100, intents=['gender_M'])
+def gender_M (turn: DialogTurn):
+    turn.user_object['gender'] = "M"
+
+@csc.add_handler(priority=100, intents=['gender_W'])
+def gender_W (turn: DialogTurn):
+    turn.user_object['gender'] = "W"
+

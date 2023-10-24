@@ -65,3 +65,16 @@ cancel:
 ping:
   -examples:
     - ping
+gender_M:
+  examples:
+    - мужской
+    - мужчина
+    - мальчик
+    - юноша
+    - парень
+gender_W:
+  examples:
+    - женский
+    - женщина
+    - девочка
+    - девушка
