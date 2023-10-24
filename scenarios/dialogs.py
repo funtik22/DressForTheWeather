@@ -98,3 +98,13 @@ def ping_pong(turn: DialogTurn):
 def alice_help(turn: DialogTurn):
     turn.response_text = 'Чтобы получить мой совет о том, как одеться по погоде, назови свой город, в котором находишься или ближайший крупный населённый пункт!'
 
+
+@csc.add_handler(priority=100, intents=['gender_M'])
+def gender_M (turn: DialogTurn):
+    turn.user_object['gender'] = "M"
+
+
+@csc.add_handler(priority=100, intents=['gender_W'])
+def gender_W (turn: DialogTurn):
+    turn.user_object['gender'] = "W"
+
