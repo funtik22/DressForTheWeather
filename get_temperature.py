@@ -28,4 +28,11 @@ def get_temperature(city):
 
 def get_condition(city):
     yandex_json = get_json(city)
-    return yandex_json['fact']['condition']
+    return str(yandex_json['fact']['condition'])
+
+
+def is_precipitation(city):
+    if get_condition(city) not in ['clear', 'partly-cloudy', 
+                                                'heavy-rain','cloudy', 'overcast']:
+        return True
+    return False

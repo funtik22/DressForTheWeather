@@ -6,3 +6,5 @@ mongomock
 requests
 bs4
 natasha
+geopy
+requests
