@@ -27,10 +27,7 @@ def is_new_session(turn: DialogTurn):
 @csc.add_handler(priority=10, regexp='(hello|hi|привет|здравствуй)')
 @csc.add_handler(priority=3, checker=is_new_session)
 def hello(turn: DialogTurn):
-    
-    #turn.response_text = str(get_temperature('Краснодар'))
-    turn.response_text = str(get_condition('Краснодар'))
-   # turn.user_object['last_phrase'] = get_temperature('Ижевск')
+    turn.response_text = str(is_precipitation('Ижевск'))+" "+get_condition("Ижевск")
 
 
 @csc.add_handler(priority=1000, intents=['ability'])
