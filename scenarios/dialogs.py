@@ -1,15 +1,3 @@
-from natasha import (
-    Segmenter,
-    NewsEmbedding,
-    NewsNERTagger,
-    Doc
-)
-#Библиотека для распознования именнованных сущностей
-
-segmenter = Segmenter()
-emb = NewsEmbedding()
-ner_tagger = NewsNERTagger(emb)
-
 from dialogic import COMMANDS
 from dialogic.cascade import DialogTurn
 
@@ -18,6 +6,7 @@ from dm import csc
 from get_temperature import *
 import json
 import random
+import pandas as pd
 
 
 with open('info.json', encoding='utf-8') as f:
@@ -37,7 +26,7 @@ def is_new_session(turn: DialogTurn):
 
 
 @csc.add_handler(priority=10, regexp='(hello|hi|привет|здравствуй)')
-@csc.add_handler(priority=3, checker=is_new_session)
+@csc.add_handler(priority=1000, checker=is_new_session)
 def hello(turn: DialogTurn):
     text = random.choice(info['hello'])
     text = f'<speaker audio="alice-sounds-game-powerup-1.opus"> <text>{text}</text><voice>{text}</voice>'
@@ -45,17 +34,26 @@ def hello(turn: DialogTurn):
     turn.user_object["last_phrase"] = text
 
 
-@csc.add_handler(priority=1000, regexp='что (надеть|одеть|одеться|выбрать)')
+@csc.add_handler(priority=5, regexp='(что|надеть|одеть|одеться|выбрать)')
 def drees_for_dress(turn: DialogTurn):
-    text = (turn.text).title()
-    doc = Doc(text)
-    doc.segment(segmenter)
-    doc.tag_ner(ner_tagger)
-    print(text)
-    if doc.spans:
-       turn.response_text = str(doc.spans[0].text)
+    if len(turn.ctx.yandex.request.nlu.entities)!=0:
+        city = str(turn.ctx.yandex.request.nlu.entities[0].value.get('city'))
     else:
-       turn.response_text = "Город не найден!"
+        city = ''
+    if city!=None and city!='':
+       turn.user_object['city'] = city
+       if turn.user_object.get('gender'):
+           text = get_advice(turn)
+           turn.response_text = text
+           turn.user_object["last_phrase"] = text
+       else:
+           text = "Назови свой пол, пожалуйста"
+           turn.response_text = text
+           turn.user_object["last_phrase"] = text
+    else:
+       text = "Город не найден!"
+       turn.response_text = text
+       turn.user_object["last_phrase"] = text
 
 
 @csc.add_handler(priority=1000, intents=['ability'])
@@ -102,10 +100,48 @@ def alice_help(turn: DialogTurn):
 
 @csc.add_handler(priority=100, intents=['gender_M'])
 def gender_M (turn: DialogTurn):
-    turn.user_object['gender'] = "M"
+    turn.user_object['gender'] = "Мужской"
+    turn.response_text = get_advice(turn)
 
 
 @csc.add_handler(priority=100, intents=['gender_W'])
 def gender_W (turn: DialogTurn):
-    turn.user_object['gender'] = "W"
+    turn.user_object['gender'] = "Женский"
+    turn.response_text = get_advice(turn)
 
+
+def get_advice(turn):
+
+    gender = turn.user_object['gender']
+
+    if gender == 'Мужской':
+        man = pd.read_excel("tempman.xlsx")
+    elif gender == 'Женский':
+        man = pd.read_excel("tempwoman.xlsx")
+    temp = get_temperature(turn.user_object['city'])
+    rain = is_precipitation(turn.user_object['city'])
+    num = random.randint(1, 3)
+
+    title = ["от 0 до +5", "от +5 до +10", "от +10 до +15", "от +15 до +20", \
+             "от +20 до +25", "от +25 до +30", "от +30 до +35", "от +35 до +40", \
+             "от +40 до +45", "от -45 до -40", "от -40 до -35", \
+             "от -35 до -30", "от -30 до -25", "от -25 до -20", "от -20 до -15", \
+             "от -15 до -10", "от -10 до -5", "от -5 до 0"]
+
+    if temp > 45:
+        recommendation = man[man["Температура"] == ">45"][[f"Совет {num}"]].head()
+        if_rain = man[man["Температура"] == ">45"][["Доп. совет в случае дождя"]].head()
+    elif temp < -45:
+        recommendation = man[man["Температура"] == "<-45"][[f"Совет {num}"]].head()
+        if_rain = man[man["Температура"] == "<-45"][["Доп. совет в случае дождя"]].head()
+    else:
+        recommendation = man[man["Температура"] == title[temp//5]][[f"Совет {num}"]].head()
+        if_rain = man[man["Температура"] == title[temp//5]][["Доп. совет в случае дождя"]].head()
+    if temp>0:
+        str_temp = "+"+str(temp)
+    else:
+        str_temp = str(temp)
+    if rain:
+        return  random.choice(info['temp'])+str_temp+"\n"+recommendation.loc[recommendation.index[0]][f"Совет {num}"]+'\n'+if_rain.loc[if_rain.index[0]]["Доп. совет в случае дождя"]
+    else:
+        return  random.choice(info['temp'])+str_temp+"\n"+recommendation.loc[recommendation.index[0]][f"Совет {num}"]
