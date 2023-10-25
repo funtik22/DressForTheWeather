@@ -1,3 +1,12 @@
+from natasha import (
+    Segmenter,
+    NewsEmbedding,
+    NewsNERTagger,
+    Doc
+)
+#Библиотека для распознования именнованных сущностей
+
+
 from dialogic import COMMANDS
 from dialogic.cascade import DialogTurn
 
@@ -6,9 +15,12 @@ from dm import csc
 import json
 import random
 
+segmenter = Segmenter()
+emb = NewsEmbedding()
+ner_tagger = NewsNERTagger(emb)
+
 with open('info.json', encoding='utf-8') as f:
     info = json.load(f)
-
 
 def is_single_pass(turn: DialogTurn) -> bool:
     """ Check that a command is passed when the skill is activated """
@@ -29,8 +41,13 @@ def hello(turn: DialogTurn):
     text = random.choice(info['hello'])
     text = f'<speaker audio="alice-sounds-game-powerup-1.opus"> <text>{text}</text><voice>{text}</voice>'
     turn.response_text = text
-    turn.user_object['last_phrase'] = text
-
+    turn.user_object["last_phrase"] = text
+    text = turn.text
+    doc = Doc(text)
+    doc.segment(segmenter)
+    doc.tag_ner(ner_tagger)
+    if doc.spans:
+        turn.response_text = get_temperature(doc.spans[0].text)
 
 @csc.add_handler(priority=1000, intents=['ability'])
 def show_rules(turn: DialogTurn):
@@ -41,7 +58,6 @@ def show_rules(turn: DialogTurn):
 @csc.add_handler(priority=1000, intents=['repeat_phrase'])
 def repeat_phrase(turn: DialogTurn):
     turn.response_text = turn.user_object['last_phrase']
-
 
 @csc.add_handler(priority=0)  # use it as a fallback scenario
 def mistake(turn: DialogTurn):
