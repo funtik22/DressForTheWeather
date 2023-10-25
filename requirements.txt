@@ -5,4 +5,4 @@ pymongo
 mongomock
 requests
 bs4
-
+natasha

@@ -6,6 +6,9 @@ from natasha import (
 )
 #Библиотека для распознования именнованных сущностей
 
+segmenter = Segmenter()
+emb = NewsEmbedding()
+ner_tagger = NewsNERTagger(emb)
 
 from dialogic import COMMANDS
 from dialogic.cascade import DialogTurn
@@ -15,9 +18,6 @@ from dm import csc
 import json
 import random
 
-segmenter = Segmenter()
-emb = NewsEmbedding()
-ner_tagger = NewsNERTagger(emb)
 
 with open('info.json', encoding='utf-8') as f:
     info = json.load(f)
@@ -42,12 +42,20 @@ def hello(turn: DialogTurn):
     text = f'<speaker audio="alice-sounds-game-powerup-1.opus"> <text>{text}</text><voice>{text}</voice>'
     turn.response_text = text
     turn.user_object["last_phrase"] = text
-    text = turn.text
+
+
+@csc.add_handler(priority=1000, regexp='что (надеть|одеть|одеться|выбрать)')
+def drees_for_dress(turn: DialogTurn):
+    text = (turn.text).title()
     doc = Doc(text)
     doc.segment(segmenter)
     doc.tag_ner(ner_tagger)
+    print(text)
     if doc.spans:
-        turn.response_text = get_temperature(doc.spans[0].text)
+       turn.response_text = str(doc.spans[0].text)
+    else:
+       turn.response_text = "Город не найден!"
+
 
 @csc.add_handler(priority=1000, intents=['ability'])
 def show_rules(turn: DialogTurn):
