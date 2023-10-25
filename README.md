@@ -7,8 +7,8 @@
 
 Сценарии:
 Основной сценарий
-![alt text](https://github.com/funtik22/DressForTheWeather/blob/main/images/main_scenario.jpg?raw=true)
+![alt text](https://github.com/funtik22/DressForTheWeather/blob/main/images/main_scenario.jpg?raw=true){ width: 200px; }
 Сценарий с подсказками:
-![alt text](https://github.com/funtik22/DressForTheWeather/blob/main/images/helps.jpg?raw=true)
+![alt text](https://github.com/funtik22/DressForTheWeather/blob/main/images/helps.jpg?raw=true){ width: 200px; }
 Обработка ошибок в три этапа (1. Попросить повторить пользователя свою фразу, 2. Повторить прошлую фразу Алисы, 3. Попросить обратиться в меню помощь)
-![alt text](https://github.com/funtik22/DressForTheWeather/blob/main/images/mistakes.jpg?raw=true)
+![alt text](https://github.com/funtik22/DressForTheWeather/blob/main/images/mistakes.jpg?raw=true){ width: 200px; }
